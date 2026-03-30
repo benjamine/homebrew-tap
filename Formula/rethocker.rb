@@ -2,16 +2,16 @@ class Rethocker < Formula
   desc "Intercept and remap global keys on macOS — with per-app and key-sequence support"
   homepage "https://github.com/benjamine/rethocker"
   license "MIT"
-  version "0.2.0"
+  version "0.2.1"
 
   on_arm do
     url "https://github.com/benjamine/rethocker/releases/download/v#{version}/rethocker-darwin-arm64.tar.gz"
-    sha256 "317091f49a1df5da869c14c299e6e25849e43e544a3c1be5e4d36bab018bea58"
+    sha256 "ba2e1ed276eb845c5c5b8b2b606d032c0c26ca76e735d91c5fb87997fd5c665d"
   end
 
   on_intel do
     url "https://github.com/benjamine/rethocker/releases/download/v#{version}/rethocker-darwin-x64.tar.gz"
-    sha256 "dea7517526567f9cfc4e6af6f158b45631d859f9d049eb53b5dccf31da7dc7c9"
+    sha256 "538b7bc21f016cc716b88f5538f07f80325d82db2843585dd59ae0bc9adc595e"
   end
 
   def install
