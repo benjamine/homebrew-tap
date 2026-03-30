@@ -8,9 +8,13 @@ jobs:
   update:
     name: Update rethocker formula
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update formula
         env:
@@ -18,15 +22,6 @@ jobs:
           SHA256_ARM64: ${{ github.event.client_payload.sha256_arm64 }}
           SHA256_X64: ${{ github.event.client_payload.sha256_x64 }}
         run: |
-          sed -i \
-            -e "s/version \".*\"/version \"${VERSION}\"/" \
-            -e "s/ARM64_SHA256_PLACEHOLDER/${SHA256_ARM64}/" \
-            -e "s/X64_SHA256_PLACEHOLDER/${SHA256_X64}/" \
-            -e "s/sha256 \"[a-f0-9]\{64\}\" # arm64/sha256 \"${SHA256_ARM64}\" # arm64/" \
-            -e "s/sha256 \"[a-f0-9]\{64\}\" # x64/sha256 \"${SHA256_X64}\" # x64/" \
-            Formula/rethocker.rb
-
-          # Update the version line and both sha256 lines properly
           python3 - <<'PYEOF'
           import re, os
 
