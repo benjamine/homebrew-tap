@@ -21,14 +21,17 @@ class Rethocker < Formula
 
   def caveats
     <<~EOS
-      To set up rethocker and start it as a background agent:
+      Get started:
         rethocker install
 
-      This will scaffold ~/.config/rethocker/default.ts and register a
-      LaunchAgent that starts on login and auto-reloads when you save the file.
+      This scaffolds ~/.config/rethocker/default.ts and registers a LaunchAgent
+      that starts on login and auto-reloads when you save the file.
 
-      To monitor what keys rethocker can capture:
+      Monitor what keys rethocker can capture:
         rethocker log
+
+      To uninstall the background agent (before brew uninstall):
+        rethocker uninstall
 
       Docs: https://github.com/benjamine/rethocker
     EOS
