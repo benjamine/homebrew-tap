@@ -1,0 +1,64 @@
+name: Update Formula
+
+on:
+  repository_dispatch:
+    types: [rethocker-release]
+
+jobs:
+  update:
+    name: Update rethocker formula
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update formula
+        env:
+          VERSION: ${{ github.event.client_payload.version }}
+          SHA256_ARM64: ${{ github.event.client_payload.sha256_arm64 }}
+          SHA256_X64: ${{ github.event.client_payload.sha256_x64 }}
+        run: |
+          sed -i \
+            -e "s/version \".*\"/version \"${VERSION}\"/" \
+            -e "s/ARM64_SHA256_PLACEHOLDER/${SHA256_ARM64}/" \
+            -e "s/X64_SHA256_PLACEHOLDER/${SHA256_X64}/" \
+            -e "s/sha256 \"[a-f0-9]\{64\}\" # arm64/sha256 \"${SHA256_ARM64}\" # arm64/" \
+            -e "s/sha256 \"[a-f0-9]\{64\}\" # x64/sha256 \"${SHA256_X64}\" # x64/" \
+            Formula/rethocker.rb
+
+          # Update the version line and both sha256 lines properly
+          python3 - <<'PYEOF'
+          import re, os
+
+          version = os.environ["VERSION"]
+          sha_arm = os.environ["SHA256_ARM64"]
+          sha_x64 = os.environ["SHA256_X64"]
+
+          with open("Formula/rethocker.rb") as f:
+            content = f.read()
+
+          content = re.sub(r'version "[^"]*"', f'version "{version}"', content)
+          content = re.sub(
+            r'(on_arm do.*?sha256 ")[^"]*(")',
+            rf'\g<1>{sha_arm}\g<2>',
+            content, flags=re.DOTALL
+          )
+          content = re.sub(
+            r'(on_intel do.*?sha256 ")[^"]*(")',
+            rf'\g<1>{sha_x64}\g<2>',
+            content, flags=re.DOTALL
+          )
+
+          with open("Formula/rethocker.rb", "w") as f:
+            f.write(content)
+
+          print(f"Updated to version {version}")
+          PYEOF
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/rethocker.rb
+          git commit -m "rethocker ${{ github.event.client_payload.version }}"
+          git push
